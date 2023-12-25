@@ -68,7 +68,7 @@ export const App = () => {
 Demo: https://stackblitz.com/edit/stackblitz-starters-pgefl6
 
 ### Sharing Rendering Data 
-It is possible to share data and rendering state among multiple containers(components).
+It is possible to share data and rendering state among multigitple containers(components).
 
 ```tsx
 import { useState, useCallback } from "react";

@@ -1,7 +1,7 @@
 {
   "name": "react-render-state-hook",
   "version": "1.0.0",
-  "description": "React Render State Hook: This hook allows you to declaratively define components that render when asynchronous data is processed.",
+  "description": "React Render State Hook: This hook allows you to declaratively define components that will be rendered based on the data processing state.",
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
   "scripts": {
