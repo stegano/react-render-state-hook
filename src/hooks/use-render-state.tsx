@@ -22,7 +22,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
   const currentHookKey = useMemo(() => key ?? hookId, [key, hookId]);
   const globalState = useSyncExternalStore<
     Record<string, DataHandlingState<Data, DataHandlingError>>
-  >(store.subscribe, store.getSnapshot);
+  >(store.subscribe, store.getSnapshot, store.getSnapshot);
   const state = useMemo<DataHandlingState<Data, DataHandlingError>>(() => {
     if (currentHookKey in globalState) {
       return globalState[currentHookKey];
