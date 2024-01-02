@@ -46,16 +46,19 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
           let promise: Promise<any> | undefined;
           for (const dataProcessingHandler of dataHandlerExecutorInterceptors) {
             // eslint-disable-next-line no-await-in-loop
-            promise = dataProcessingHandler(await promise, dataHandlerExecutor, executorId) as any;
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
-            store.set(currentHookKey, (prev) => {
-              return {
-                promise,
-                data: prev?.data,
-                previousData: prev?.previousData,
-                status: DataHandlingStatus.IN_PROGRESS,
-              };
-            });
+            const previousData = await promise;
+            promise = dataProcessingHandler(previousData, dataHandlerExecutor, executorId);
+            if (promise instanceof Promise) {
+              // eslint-disable-next-line @typescript-eslint/no-loop-func
+              store.set(currentHookKey, (prev) => {
+                return {
+                  promise,
+                  data: prev?.data,
+                  previousData: prev?.previousData,
+                  status: DataHandlingStatus.IN_PROGRESS,
+                };
+              });
+            }
           }
           const data = await promise;
           store.set(currentHookKey, (prev) => ({
@@ -65,13 +68,17 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
           }));
           return data;
         }
-        const promise = dataHandlerExecutor(store.get(currentHookKey)?.data);
-        store.set(currentHookKey, (prev) => ({
-          data: prev?.data,
-          previousData: prev?.previousData,
-          status: DataHandlingStatus.IN_PROGRESS,
-          promise,
-        }));
+        const evaludatedData = dataHandlerExecutor(store.get(currentHookKey)?.data);
+        const promise =
+          evaludatedData instanceof Promise ? evaludatedData : Promise.resolve(evaludatedData);
+        if (evaludatedData instanceof Promise) {
+          store.set(currentHookKey, (prev) => ({
+            data: prev?.data,
+            previousData: prev?.previousData,
+            status: DataHandlingStatus.IN_PROGRESS,
+            promise,
+          }));
+        }
         const data = await promise;
         store.set(currentHookKey, (prev) => ({
           data,

@@ -310,6 +310,46 @@ describe("`useRenderState` Testing", () => {
       expect(state3.children?.join("")).toEqual("Success(Bbb, Aaa)");
     });
   });
+  it("renderSuccess(sync)", async () => {
+    const TestComponent = () => {
+      const [render, handleData] = useRenderState<string>();
+      useEffect(() => {
+        handleData(async () => {
+          return "Aaa";
+        });
+      }, [handleData]);
+      return render(
+        (data, prevData) => {
+          return (
+            <button
+              type="button"
+              onClick={() => {
+                handleData(() => {
+                  return "Bbb";
+                });
+              }}
+            >
+              Success({data}
+              {prevData ? `, ${prevData}` : ""})
+            </button>
+          );
+        },
+        <p>Loading</p>,
+        <p>Error</p>,
+      );
+    };
+    const component = ReactTestRender.create(<TestComponent />);
+    const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+    expect(state1.children?.join("")).toEqual("Loading");
+    await ReactTestRender.act(async () => {
+      await delay(100 * 2);
+      const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(state2.children?.join("")).toEqual("Success(Aaa)");
+      state2.props.onClick();
+      const state3 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(state3.children?.join("")).not.toEqual("Loading");
+    });
+  });
   it("shared data", async () => {
     const TestComponentA = () => {
       const task = useCallback(

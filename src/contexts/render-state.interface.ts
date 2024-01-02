@@ -6,7 +6,7 @@ export interface DataHandlerExecutorInterceptor<Data extends any = any> {
     dataHandlerExecutor: DataHandlerExecutor<Data>,
     previousData?: Data,
     executorId?: string,
-  ): Promise<Data>;
+  ): ReturnType<typeof dataHandlerExecutor>;
 }
 
 export interface Context<Data extends any = any> {

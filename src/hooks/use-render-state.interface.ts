@@ -7,7 +7,7 @@ export enum DataHandlingStatus {
 }
 
 export interface DataHandlerExecutor<Data extends any = any> {
-  (previousData?: Data): Promise<Data>;
+  (previousData?: Data): Promise<Data> | Data;
 }
 
 export interface DataHandler<Data> {
