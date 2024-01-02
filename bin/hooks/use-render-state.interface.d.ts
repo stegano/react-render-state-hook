@@ -5,7 +5,7 @@ export declare enum DataHandlingStatus {
     FAILED = "FAILED"
 }
 export interface DataHandlerExecutor<Data extends any = any> {
-    (previousData?: Data): Promise<Data>;
+    (previousData?: Data): Promise<Data> | Data;
 }
 export interface DataHandler<Data> {
     (executor: DataHandlerExecutor<Data>, id?: string): Promise<Data>;
