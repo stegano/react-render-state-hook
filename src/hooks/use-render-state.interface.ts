@@ -15,6 +15,10 @@ export interface DataHandler<Data> {
   (executor: DataHandlerExecutor<Data>, executorId?: string): Promise<Data>;
 }
 
+export interface DataResetHandler {
+  (): void;
+}
+
 export type RenderWhenDataHandlingIdle<Data> = ReactNode | ((previousData?: Data) => ReactNode);
 
 export type RenderWhenDataHandlingCompleted<Data> =
@@ -50,6 +54,7 @@ export interface DataHandlingState<Data, DataHandlingError> {
 export type Renderer<Data, DataHandlingError> = [
   render: Render<Data, DataHandlingError>,
   handleData: DataHandler<Data>,
+  handleResetData: DataResetHandler,
   dataHandlingState: DataHandlingState<Data, DataHandlingError>,
 ];
 

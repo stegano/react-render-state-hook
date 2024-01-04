@@ -7,6 +7,7 @@ import {
   type DataHandler,
   DataHandlingState,
   Options,
+  DataResetHandler,
 } from "./use-render-state.interface";
 import { RenderStateContext } from "../contexts";
 import type { IRenderStateContext } from "../contexts";
@@ -100,6 +101,13 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
     [context, currentHookKey],
   );
 
+  const handleDataReset: DataResetHandler = useCallback(() => {
+    store.set(currentHookKey, (prev) => ({
+      previousData: prev?.data,
+      status: DataHandlingStatus.IDLE,
+    }));
+  }, [currentHookKey]);
+
   const render: Render<Data, DataHandlingError> = useCallback(
     (
       renderWhenDataHandlingCompleted,
@@ -147,7 +155,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
     [state, options.default],
   );
 
-  return [render, handleData, state];
+  return [render, handleData, handleDataReset, state];
 };
 
 export default useRenderState;

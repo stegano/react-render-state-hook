@@ -610,4 +610,36 @@ describe("`useRenderState` Testing", () => {
       expect(componentBstate3.children?.join("")).toEqual("Error!");
     });
   });
+  it("When the `DataResetHandler` function is invoked, assert the state", async () => {
+    const TestComponent = () => {
+      const [renderData, , handleDataReset] = useRenderState<string>({
+        default: "Test",
+      });
+      return renderData(
+        (data) => (
+          <button
+            type="button"
+            onClick={() => {
+              handleDataReset();
+            }}
+          >
+            Success({data})
+          </button>
+        ),
+        <p>Idle</p>,
+        <p>Loading</p>,
+        <p>Error</p>,
+      );
+    };
+    const component = ReactTestRender.create(<TestComponent />);
+    await ReactTestRender.act(async () => {
+      const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(state1.children?.join("")).toEqual("Success(Test)");
+      const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      state2.props.onClick();
+      await delay(1);
+      const state3 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(state3.children?.join("")).toEqual("Idle");
+    });
+  });
 });
