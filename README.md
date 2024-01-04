@@ -56,6 +56,7 @@ export const App = () => {
   // Use `render` function to define rendering for data processing statuses: succeeded, in-progress, or failed. It auto-renders based on the `handleData` function's processing status.
   return render(
     (data) => <button onClick={handleButtonClick}>Succeeded({data})</button>,
+    <p>Idle</p>,
     <p>Loading..</p>,
     (error) => <p>Error, Oops something went wrong.. :(, ({error.message})</p>
   );
@@ -63,7 +64,7 @@ export const App = () => {
 ```
 Demo: https://stackblitz.com/edit/stackblitz-starters-fhiu6s
 
-### Sharing Rendering Data 
+### Share Rendering Data 
 It is possible to share data and rendering state among multigitple containers(components).
 
 ```tsx
@@ -95,6 +96,7 @@ export const ComponentA = () => {
 
   return render(
     (data) => <button onClick={handleButtonClick}>Succeeded({data})</button>,
+    <p>Idle</p>,
     <p>Loading..</p>,
     (error) => <p>Error, Oops something went wrong.. :(, ({error.message})</p>
   );
