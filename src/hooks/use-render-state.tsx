@@ -29,7 +29,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
     }
     if ("default" in options) {
       return {
-        status: DataHandlingStatus.SUCCEEDED,
+        status: DataHandlingStatus.COMPLETED,
         data: options.default,
       };
     }
@@ -64,7 +64,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
           store.set(currentHookKey, (prev) => ({
             data,
             previousData: prev?.data,
-            status: DataHandlingStatus.SUCCEEDED,
+            status: DataHandlingStatus.COMPLETED,
           }));
           return data;
         }
@@ -83,7 +83,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
         store.set(currentHookKey, (prev) => ({
           data,
           previousData: prev?.data,
-          status: DataHandlingStatus.SUCCEEDED,
+          status: DataHandlingStatus.COMPLETED,
         }));
         return data;
       } catch (e) {
@@ -92,7 +92,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
           error,
           data: prev?.data,
           previousData: prev?.previousData,
-          status: DataHandlingStatus.FAILED,
+          status: DataHandlingStatus.FAILURE,
         }));
         throw e;
       }
@@ -108,12 +108,12 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
     ) => {
       const { data, previousData, status, error, promise } = state;
       switch (status) {
-        case DataHandlingStatus.SUCCEEDED: {
+        case DataHandlingStatus.COMPLETED: {
           return typeof renderWhenDataHandlingSucceeded === "function"
             ? renderWhenDataHandlingSucceeded((data ?? options.default) as Data, previousData)
             : renderWhenDataHandlingSucceeded || null;
         }
-        case DataHandlingStatus.FAILED: {
+        case DataHandlingStatus.FAILURE: {
           if (typeof renderWhenDataHandlingFailed === undefined) {
             /**
              * Propagate the error upwards if the error component does not exist,

@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 
 export enum DataHandlingStatus {
   IN_PROGRESS = "IN_PROGRESS",
-  SUCCEEDED = "SUCCEEDED",
-  FAILED = "FAILED",
+  COMPLETED = "COMPLETED",
+  FAILURE = "FAILURE",
 }
 
 export interface DataHandlerExecutor<Data extends any = any> {
