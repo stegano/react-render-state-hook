@@ -7,6 +7,9 @@ export enum DataHandlingStatus {
   FAILURE = "FAILURE",
 }
 
+/**
+ * `DataHandlerExecutor` is a function that handles data.
+ */
 export interface DataHandlerExecutor<Data extends any = any> {
   (previousData?: Data): Promise<Data> | Data;
 }
@@ -19,27 +22,37 @@ export interface DataResetHandler {
   (): void;
 }
 
-export type RenderWhenDataHandlingIdle<Data> = ReactNode | ((previousData?: Data) => ReactNode);
+/**
+ * `IdleRenderer` is rendered when the data handling status is `IDLE`.
+ */
+export type IdleRenderer<Data> = ReactNode | ((previousData?: Data) => ReactNode);
 
-export type RenderWhenDataHandlingCompleted<Data> =
-  | ReactNode
-  | ((data: Data, previousData?: Data) => ReactNode);
+/**
+ * `CompletedRenderer` is rendered when the data handling status is `COMPLETED`.
+ */
+export type CompletedRenderer<Data> = ReactNode | ((data: Data, previousData?: Data) => ReactNode);
 
-export type RenderWhenDataHandlingInProgress<Data> =
+/**
+ * `InProgressRenderer` is rendered when the data handling status is `IN_PROGRESS`.
+ */
+export type InProgressRenderer<Data> =
   | ReactNode
   | ((data?: Promise<Data>, previousData?: Data) => ReactNode);
 
-export type RenderWhenDataHandlingFailure<
+/**
+ * `FailureRenderer` is rendered when the data handling status is `FAILURE`.
+ */
+export type FailureRenderer<
   DataHandlingError extends Error | unknown = unknown,
   Data extends any = any,
 > = ReactNode | ((error: DataHandlingError, previousData?: Data) => ReactNode);
 
 export interface Render<Data = any, DataHandlingError = any> {
   (
-    renderWhenDataHandlingCompleted?: RenderWhenDataHandlingCompleted<Data>,
-    renderWhenDataHandlingIdle?: RenderWhenDataHandlingIdle<Data>,
-    renderWhenDataHandlingInProgress?: RenderWhenDataHandlingInProgress<Data>,
-    renderWhenDataHandlingFailure?: RenderWhenDataHandlingFailure<DataHandlingError, Data>,
+    completedRenderer?: CompletedRenderer<Data>,
+    idleRenderer?: IdleRenderer<Data>,
+    inProgressRenderer?: InProgressRenderer<Data>,
+    failureRenderer?: FailureRenderer<DataHandlingError, Data>,
   ): ReactNode;
 }
 
