@@ -33,7 +33,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
         data: options.default,
       };
     }
-    return { status: DataHandlingStatus.IN_PROGRESS };
+    return { status: DataHandlingStatus.IDLE };
   }, [globalState, currentHookKey, options]);
 
   const context = useContext<IRenderStateContext.Context>(RenderStateContext);
@@ -102,19 +102,25 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
 
   const render: Render<Data, DataHandlingError> = useCallback(
     (
-      renderWhenDataHandlingSucceeded,
+      renderWhenDataHandlingCompleted,
+      renderWhenDataHandlingIdle,
       renderWhenDataHandlingInProgress,
-      renderWhenDataHandlingFailed,
+      renderWhenDataHandlingFailure,
     ) => {
       const { data, previousData, status, error, promise } = state;
       switch (status) {
+        case DataHandlingStatus.IDLE: {
+          return typeof renderWhenDataHandlingIdle === "function"
+            ? renderWhenDataHandlingIdle(previousData)
+            : renderWhenDataHandlingIdle;
+        }
         case DataHandlingStatus.COMPLETED: {
-          return typeof renderWhenDataHandlingSucceeded === "function"
-            ? renderWhenDataHandlingSucceeded((data ?? options.default) as Data, previousData)
-            : renderWhenDataHandlingSucceeded || null;
+          return typeof renderWhenDataHandlingCompleted === "function"
+            ? renderWhenDataHandlingCompleted((data ?? options.default) as Data, previousData)
+            : renderWhenDataHandlingCompleted || null;
         }
         case DataHandlingStatus.FAILURE: {
-          if (typeof renderWhenDataHandlingFailed === undefined) {
+          if (typeof renderWhenDataHandlingFailure === undefined) {
             /**
              * Propagate the error upwards if the error component does not exist,
              * so that it can be handled at the error boundary.
@@ -126,9 +132,9 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
           if (typeof error === "undefined") {
             throw new Error("The `ProcessError` is undefined");
           }
-          return typeof renderWhenDataHandlingFailed === "function"
-            ? renderWhenDataHandlingFailed(error, previousData)
-            : renderWhenDataHandlingFailed || null;
+          return typeof renderWhenDataHandlingFailure === "function"
+            ? renderWhenDataHandlingFailure(error, previousData)
+            : renderWhenDataHandlingFailure || null;
         }
         case DataHandlingStatus.IN_PROGRESS:
         default: {

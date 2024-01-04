@@ -22,6 +22,7 @@ describe("`useRenderState` Testing", () => {
           }),
         [],
       );
+
       const [render, handleData] = useRenderState<string>();
 
       useEffect(() => {
@@ -30,15 +31,18 @@ describe("`useRenderState` Testing", () => {
           return "Aaa";
         });
       }, [handleData, task]);
-      return render((data) => <p>Success({data})</p>, <p>Loading</p>, <p>Error</p>);
+      return render((data) => <p>Success({data})</p>, <p>Idle</p>, <p>Loading</p>, <p>Error</p>);
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
+    await delay(1);
+    const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+    expect(state2.children?.join("")).toEqual("Loading");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
-      const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-      expect(state2.children?.join("")).toEqual("Success(Aaa)");
+      const state3 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(state3.children?.join("")).toEqual("Success(Aaa)");
     });
   });
   it("renderError", async () => {
@@ -59,13 +63,14 @@ describe("`useRenderState` Testing", () => {
       }, [asyncErrorTask, handleData]);
       return render(
         (data) => <p>Success({data})</p>,
+        <p>Idle</p>,
         <p>Loading</p>,
         (e) => <p>Error({e.message})</p>,
       );
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -90,7 +95,7 @@ describe("`useRenderState` Testing", () => {
           return "Aaa";
         });
       }, [handleData, task]);
-      return render((data) => <p>Success({data})</p>, <p>Loading</p>, <p>Error</p>);
+      return render((data) => <p>Success({data})</p>, <p>Loading</p>, <p>Loading</p>, <p>Error</p>);
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -117,7 +122,7 @@ describe("`useRenderState` Testing", () => {
           return "Aaa";
         });
       }, [handleData, task]);
-      return render((data) => <p>Success({data})</p>, <p>Loading</p>, <p>Error</p>);
+      return render((data) => <p>Success({data})</p>, <p>Idle</p>, <p>Loading</p>, <p>Error</p>);
     };
     const component = ReactTestRender.create(
       <RenderStateProvider
@@ -131,7 +136,7 @@ describe("`useRenderState` Testing", () => {
       </RenderStateProvider>,
     );
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -168,6 +173,7 @@ describe("`useRenderState` Testing", () => {
             Success({data})
           </button>
         ),
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
@@ -185,7 +191,7 @@ describe("`useRenderState` Testing", () => {
       </RenderStateProvider>,
     );
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -214,7 +220,7 @@ describe("`useRenderState` Testing", () => {
           return "Aaa";
         });
       }, [handleData, task]);
-      return render((data) => <p>Success({data})</p>, <p>Loading</p>, <p>Error</p>);
+      return render((data) => <p>Success({data})</p>, <p>Idle</p>, <p>Loading</p>, <p>Error</p>);
     };
     const component = ReactTestRender.create(
       <RenderStateProvider
@@ -234,7 +240,7 @@ describe("`useRenderState` Testing", () => {
       </RenderStateProvider>,
     );
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -249,11 +255,11 @@ describe("`useRenderState` Testing", () => {
           throw new Error("Error");
         }).catch(() => {});
       }, [handleData]);
-      return render(<p>Success</p>, <p>Loading</p>, <p>Error</p>);
+      return render(<p>Success</p>, <p>Idle</p>, <p>Loading</p>, <p>Error</p>);
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -293,13 +299,14 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -334,13 +341,14 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
     };
     const component = ReactTestRender.create(<TestComponent />);
     const state1 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(state1.children?.join("")).toEqual("Loading");
+    expect(state1.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const state2 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -383,6 +391,7 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
@@ -398,14 +407,15 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
     };
     const componentA = ReactTestRender.create(<TestComponentA />);
-    const componentB = ReactTestRender.create(<TestComponentB />);
     const componentAState = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(componentAState.children?.join("")).toEqual("Loading");
+    expect(componentAState.children?.join("")).toEqual("Idle");
+    const componentB = ReactTestRender.create(<TestComponentB />);
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const componentAstate2 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -451,6 +461,7 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
@@ -466,13 +477,14 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
     };
     const componentA = ReactTestRender.create(<TestComponentA />);
     const componentAState = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(componentAState.children?.join("")).toEqual("Loading");
+    expect(componentAState.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const componentAstate2 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -510,6 +522,7 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
@@ -525,14 +538,15 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         <p>Error</p>,
       );
     };
     const componentA = ReactTestRender.create(<TestComponentA />);
-    const componentB = ReactTestRender.create(<TestComponentB />);
     const componentAState = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(componentAState.children?.join("")).toEqual("Loading");
+    expect(componentAState.children?.join("")).toEqual("Idle");
+    const componentB = ReactTestRender.create(<TestComponentB />);
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const componentAstate2 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
@@ -569,17 +583,20 @@ describe("`useRenderState` Testing", () => {
             </button>
           );
         },
+        <p>Idle</p>,
         <p>Loading</p>,
         (e) => <p>{(e as Error).message}</p>,
       );
     };
     const TestComponentB = () => {
       const [render] = useRenderState<string>(undefined, "share error 2");
-      return render(<p>Success</p>, <p>Loading</p>, (e) => <p>{(e as Error).message}</p>);
+      return render(<p>Success</p>, <p>Idle</p>, <p>Loading</p>, (e) => (
+        <p>{(e as Error).message}</p>
+      ));
     };
     const componentA = ReactTestRender.create(<TestComponentA />);
     const componentAState = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
-    expect(componentAState.children?.join("")).toEqual("Loading");
+    expect(componentAState.children?.join("")).toEqual("Idle");
     await ReactTestRender.act(async () => {
       await delay(100 * 2);
       const componentAstate2 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;

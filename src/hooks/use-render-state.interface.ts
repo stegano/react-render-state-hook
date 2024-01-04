@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 export enum DataHandlingStatus {
+  IDLE = "IDLE",
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   FAILURE = "FAILURE",
@@ -11,10 +12,12 @@ export interface DataHandlerExecutor<Data extends any = any> {
 }
 
 export interface DataHandler<Data> {
-  (executor: DataHandlerExecutor<Data>, id?: string): Promise<Data>;
+  (executor: DataHandlerExecutor<Data>, executorId?: string): Promise<Data>;
 }
 
-export type RenderWhenDataHandlingSucceeded<Data> =
+export type RenderWhenDataHandlingIdle<Data> = ReactNode | ((previousData?: Data) => ReactNode);
+
+export type RenderWhenDataHandlingCompleted<Data> =
   | ReactNode
   | ((data: Data, previousData?: Data) => ReactNode);
 
@@ -22,16 +25,17 @@ export type RenderWhenDataHandlingInProgress<Data> =
   | ReactNode
   | ((data?: Promise<Data>, previousData?: Data) => ReactNode);
 
-export type RenderWhenDataHandlingFailed<
+export type RenderWhenDataHandlingFailure<
   DataHandlingError extends Error | unknown = unknown,
   Data extends any = any,
 > = ReactNode | ((error: DataHandlingError, previousData?: Data) => ReactNode);
 
 export interface Render<Data = any, DataHandlingError = any> {
   (
-    renderWhenDataHandlingSucceeded?: RenderWhenDataHandlingSucceeded<Data>,
+    renderWhenDataHandlingCompleted?: RenderWhenDataHandlingCompleted<Data>,
+    renderWhenDataHandlingIdle?: RenderWhenDataHandlingIdle<Data>,
     renderWhenDataHandlingInProgress?: RenderWhenDataHandlingInProgress<Data>,
-    renderWhenDataHandlingFailed?: RenderWhenDataHandlingFailed<DataHandlingError, Data>,
+    renderWhenDataHandlingFailure?: RenderWhenDataHandlingFailure<DataHandlingError, Data>,
   ): ReactNode;
 }
 
