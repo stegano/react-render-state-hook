@@ -1,8 +1,9 @@
 import { createContext, useMemo } from "react";
 import { Context, Props } from "./render-state.interface";
 import { createStore } from "../store/store";
+import { DataHandlingState } from "../hooks/use-render-state.interface";
 
-export const defaultStore = createStore();
+export const defaultStore = createStore<DataHandlingState<any, any>>();
 
 export const RenderStateContext = createContext<Context>({
   getDataHandlerExecutorInterceptorList: () => {
