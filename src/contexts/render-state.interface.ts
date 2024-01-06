@@ -13,4 +13,4 @@ export interface Context<Data extends any = any> {
   dataHandlerExecutorInterceptors: DataHandlerExecutorInterceptor<Data>[];
 }
 
-export type Props = PropsWithChildren<Context>;
+export type Props = PropsWithChildren<Partial<Context>>;
