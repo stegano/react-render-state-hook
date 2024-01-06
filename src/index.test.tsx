@@ -1,9 +1,9 @@
 import ReactTestRender from "react-test-renderer";
 import { useCallback, useEffect } from "react";
 import { useRenderState } from "./hooks";
-import { RenderStateProvider } from "./contexts";
+import { RenderStateProvider } from "./providers";
 import { createStore } from "./store/store";
-import { defaultStore } from "./contexts/render-state";
+import { defaultStore } from "./providers/render-state";
 
 const delay = (ms: number) =>
   new Promise<void>((resolve) => {

@@ -10,7 +10,7 @@ import {
   Options,
   DataResetHandler,
 } from "./use-render-state.interface";
-import { RenderStateContext } from "../contexts";
+import { RenderStateContext } from "../providers";
 
 const useRenderState = <Data extends any = any, DataHandlingError = Error | unknown>(
   options: Options<Data> = {},
