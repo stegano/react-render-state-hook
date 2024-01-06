@@ -9,7 +9,7 @@ export interface Listener {
  * Middleware
  */
 export interface Middleware<Data, Dataset = Record<string, Data>> {
-  (id: string, next: Data, store: Dataset): { id: string; data: Data } | undefined;
+  (id: string, next: Data, store: Dataset): Data;
 }
 
 /**
