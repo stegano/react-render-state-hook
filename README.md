@@ -47,7 +47,7 @@ export const App = () => {
 Demo: https://stackblitz.com/edit/stackblitz-starters-uv8yjs
 
 ### Share Rendering Data 
-It is possible to share data and rendering state among multigitple containers(components).
+Without state management libraries like Redux, it is possible to share data and rendering state among multiple containers(components).
 
 ```tsx
 import { useCallback, useEffect } from 'react';
@@ -101,31 +101,67 @@ export const App = () => {
 Demo: https://stackblitz.com/edit/stackblitz-starters-gb4yt6
 
 
-## 🧐 Advanced features
+## RenderStateProvider
 
-### dataHandlerExecutorInterceptorList
-`dataHandlerExecutorInterceptorList` can intercept `dataHandlerExecutor` execution, allowing you to transform it. It can be useful for adding logs for data processing or injecting dummy data for use in Storybook and testing environments.
+### Store
+Through the store option, you can create and pass an internally used store for state management. Additionally, you can enable debugging settings for the store object to check logs in the browser console or register necessary middlewares.
+```ts
+import { useEffect } from 'react';
+import {
+  RenderStateProvider,
+  Store,
+  useRenderState,
+  IRenderState,
+} from 'react-render-state-hook';
+
+const customStroe = Store.createStore<IRenderState.DataHandlingState<any, any>>(
+  {
+    debug: true,
+    middlewareList: [
+      (id, next, store) => {
+        next.data += ` World | ${id} | ${JSON.stringify(store)}`;
+        return next;
+      },
+    ],
+  }
+);
+
+const Component = () => {
+  const [render, handleData] = useRenderState<string>();
+
+  useEffect(() => {
+    handleData(() => 'Hello');
+  }, [handleData]);
+
+  return render((data) => <p>{data}</p>);
+};
+
+export const App = () => {
+  return (
+    <RenderStateProvider store={customStroe}>
+      <Component />
+    </RenderStateProvider>
+  );
+};
+
+```
+Demo: https://stackblitz.com/edit/stackblitz-starters-vc1jnu
+
+### DataHandlerExecutorInterceptorList
+The `dataHandlerExecutorInterceptorList` can intercept the execution of `dataHandlerExecutor` enabling you to transform it. This can be beneficial for tasks such as adding logs to track data processing or injecting dummy data for use in Storybook and testing environments.
 
 ```tsx
 import { useCallback, useEffect } from 'react';
 import { RenderStateProvider, useRenderState } from 'react-render-state-hook';
 
-const Component = () => {
-  const generateGreetingMessage = useCallback(async () => {
-    // e.g., asynchronous processing tasks like `return (await axios.get('.../data.json')).data.greeting;` are also possible.
-    return 'Hi';
-  }, []);
+// 'greeting' is the executorId. This value serves as an identifier in `dataHandlerExecutorInterceptor` to distinguish tasks.
+const greetingId = 'greeting';
 
+const Component = () => {
   const [render, handleData] = useRenderState<string>();
 
   useEffect(() => {
-    handleData(
-      async () => {
-        const greeting = await generateGreetingMessage();
-        return greeting;
-      },
-      'greeting' // 'greeting' is the executorId. This value serves as an identifier in `dataHandlerExecutorInterceptorList` to distinguish tasks.
-    );
+    handleData(() => 'Hi', greetingId);
   }, [handleData]);
 
   return render((greeting) => <p>{greeting}</p>);
@@ -136,7 +172,7 @@ export const App = ({ children }) => {
     <RenderStateProvider
       dataHandlerExecutorInterceptorList={[
         async (_previousInterceptorResult, dataHandlerExecutor, executorId) => {
-          if (executorId === 'greeting') {
+          if (executorId === greetingId) {
             // The `dataHandlerExecutor` with an executorId value of 'greeting' is not actually executed instead, this provider returns the value 'Hello'.
             return 'Hello';
           }
@@ -148,6 +184,7 @@ export const App = ({ children }) => {
     </RenderStateProvider>
   );
 };
+
 ```
 Demo: https://stackblitz.com/edit/stackblitz-starters-hfd32h
 ## Contributors ✨
