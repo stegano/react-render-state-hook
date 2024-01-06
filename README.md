@@ -30,36 +30,21 @@ import { useRenderState } from 'react-render-state-hook';
 export const App = () => {
   const [render, handleData] = useRenderState<string, Error>();
 
-  // When this function is invoked, it generates and returns a random string after 3 seconds.
-  const updateRandomString = useCallback(
-    () =>
-      new Promise<string>((resolve) => {
-        const randomString = Math.random().toString(32).slice(2);
-        setTimeout(() => resolve(randomString), 1000 * 3);
-      }),
-    []
-  );
-
   useEffect(() => {
-    // When the component is first rendered, it updates a random string.
-    handleData(async () => updateRandomString());
-  }, [updateRandomString, handleData]);
+    handleData(async () => {
+      return 'Hello World';
+    });
+  }, [handleData]);
 
-  const handleButtonClick = useCallback(() => {
-    // When the button is clicked, it updates a random string.
-    handleData(async () => updateRandomString());
-  }, [updateRandomString, handleData]);
-
-  // Use `render` function to define rendering for data processing statuses: succeeded, in-progress, or failed. It auto-renders based on the `handleData` function's processing status.
   return render(
-    (data) => <button onClick={handleButtonClick}>Succeeded({data})</button>,
+    (data) => <div>Completed({data})</div>,
     <p>Idle</p>,
     <p>Loading..</p>,
     (error) => <p>Error, Oops something went wrong.. :(, ({error.message})</p>
   );
 };
 ```
-Demo: https://stackblitz.com/edit/stackblitz-starters-fhiu6s
+Demo: https://stackblitz.com/edit/stackblitz-starters-uv8yjs
 
 ### Share Rendering Data 
 It is possible to share data and rendering state among multigitple containers(components).
@@ -68,31 +53,22 @@ It is possible to share data and rendering state among multigitple containers(co
 import { useCallback, useEffect } from 'react';
 import { useRenderState } from 'react-render-state-hook';
 
+const shareKey = 'shareKey';
+
 export const ComponentA = () => {
   const [render, handleData] = useRenderState<string, Error>(
     undefined,
-    'randomString' // By providing a data sharing key, you can share data processing state and values.
-  );
-
-  const updateRandomString = useCallback(
-    () =>
-      new Promise<string>((resolve) => {
-        const randomString = Math.random().toString(32).slice(2);
-        setTimeout(() => resolve(randomString), 1000 * 3);
-      }),
-    []
+    shareKey
   );
 
   useEffect(() => {
-    handleData(async () => updateRandomString());
-  }, [updateRandomString, handleData]);
-
-  const handleButtonClick = useCallback(() => {
-    handleData(async () => updateRandomString());
-  }, [updateRandomString, handleData]);
+    handleData(async () => {
+      return 'Hello World';
+    });
+  }, [handleData]);
 
   return render(
-    (data) => <button onClick={handleButtonClick}>Succeeded({data})</button>,
+    (data) => <div>Completed({data})</div>,
     <p>Idle</p>,
     <p>Loading..</p>,
     (error) => <p>Error, Oops something went wrong.. :(, ({error.message})</p>
@@ -100,14 +76,14 @@ export const ComponentA = () => {
 };
 
 export const ComponentB = () => {
-  const [render] = useRenderState<string, Error>(
+  const [render, handleData] = useRenderState<string, Error>(
     undefined,
-    'randomString' // By providing a data sharing key, you can share data processing state and values.
+    shareKey
   );
 
-  // While this component does not directly handle the data, the rendering data state is updated by ComponentA.
   return render(
-    (data) => <div>{data}</div>,
+    (data) => <div>Completed({data})</div>,
+    <p>Idle</p>,
     <p>Loading..</p>,
     (error) => <p>Error, Oops something went wrong.. :(, ({error.message})</p>
   );
@@ -122,7 +98,7 @@ export const App = () => {
   );
 };
 ```
-Demo: https://stackblitz.com/edit/stackblitz-starters-zj1gfs
+Demo: https://stackblitz.com/edit/stackblitz-starters-gb4yt6
 
 
 ## 🧐 Advanced features
