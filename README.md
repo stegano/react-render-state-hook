@@ -1,9 +1,6 @@
 # React Render State Hook
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-![NPM License](https://img.shields.io/npm/l/react-render-state-hook)
-![NPM Downloads](https://img.shields.io/npm/dw/react-render-state-hook)
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-) <!-- ALL-CONTRIBUTORS-BADGE:END --> ![NPM License](https://img.shields.io/npm/l/react-render-state-hook) ![NPM Downloads](https://img.shields.io/npm/dw/react-render-state-hook)
 
 React Render State Hook: This hook allows you to declaratively define components that will be rendered based on the data processing state.
 
@@ -130,8 +127,8 @@ Demo: https://stackblitz.com/edit/stackblitz-starters-zj1gfs
 
 ## 🧐 Advanced features
 
-### dataHandlerExecutorInterceptors
-`dataHandlerExecutorInterceptors` can intercept `dataHandlerExecutor` execution, allowing you to transform it. It can be useful for adding logs for data processing or injecting dummy data for use in Storybook and testing environments.
+### dataHandlerExecutorInterceptorList
+`dataHandlerExecutorInterceptorList` can intercept `dataHandlerExecutor` execution, allowing you to transform it. It can be useful for adding logs for data processing or injecting dummy data for use in Storybook and testing environments.
 
 ```tsx
 import { useCallback, useEffect } from 'react';
@@ -151,7 +148,7 @@ const Component = () => {
         const greeting = await generateGreetingMessage();
         return greeting;
       },
-      'greeting' // 'greeting' is the executorId. This value serves as an identifier in `dataHandlerExecutorInterceptors` to distinguish tasks.
+      'greeting' // 'greeting' is the executorId. This value serves as an identifier in `dataHandlerExecutorInterceptorList` to distinguish tasks.
     );
   }, [handleData]);
 
@@ -161,7 +158,7 @@ const Component = () => {
 export const App = ({ children }) => {
   return (
     <RenderStateProvider
-      dataHandlerExecutorInterceptors={[
+      dataHandlerExecutorInterceptorList={[
         async (_previousInterceptorResult, dataHandlerExecutor, executorId) => {
           if (executorId === 'greeting') {
             // The `dataHandlerExecutor` with an executorId value of 'greeting' is not actually executed instead, this provider returns the value 'Hello'.

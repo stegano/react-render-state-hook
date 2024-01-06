@@ -131,7 +131,7 @@ describe("`useRenderState` Testing", () => {
     };
     const component = ReactTestRender.create(
       <RenderStateProvider
-        dataHandlerExecutorInterceptors={[
+        dataHandlerExecutorInterceptorList={[
           async () => {
             return "Bbb";
           },
@@ -185,7 +185,7 @@ describe("`useRenderState` Testing", () => {
     };
     const component = ReactTestRender.create(
       <RenderStateProvider
-        dataHandlerExecutorInterceptors={[
+        dataHandlerExecutorInterceptorList={[
           async () => {
             await delay(100);
             return "Bbb";
@@ -209,7 +209,7 @@ describe("`useRenderState` Testing", () => {
       // expect(state4.children?.join("")).toEqual("Success(Bbb)");
     });
   });
-  it("renderSuccess(multiple dataHandlerExecutorInterceptors)", async () => {
+  it("renderSuccess(multiple dataHandlerExecutorInterceptorList)", async () => {
     const TestComponent = () => {
       const task = useCallback(
         async () =>
@@ -229,7 +229,7 @@ describe("`useRenderState` Testing", () => {
     };
     const component = ReactTestRender.create(
       <RenderStateProvider
-        dataHandlerExecutorInterceptors={[
+        dataHandlerExecutorInterceptorList={[
           async () => {
             return "B";
           },

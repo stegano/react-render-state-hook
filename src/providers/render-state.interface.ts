@@ -21,5 +21,5 @@ export interface Context {
 
 export interface Props<Data extends any = any, DataHandlingError = any> extends PropsWithChildren {
   store?: Store<DataHandlingState<Data, DataHandlingError>>;
-  dataHandlerExecutorInterceptors?: DataHandlerExecutorInterceptor<Data>[];
+  dataHandlerExecutorInterceptorList?: DataHandlerExecutorInterceptor<Data>[];
 }
