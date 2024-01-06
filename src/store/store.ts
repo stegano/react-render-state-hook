@@ -2,21 +2,23 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
 
-import { Middleware, Store } from "./store.interface";
+import { Options, Store } from "./store.interface";
 
 /**
  * `createStore` is a function that creates a store object for managing state.
  * @see https://react.dev/reference/react/useSyncExternalStore
  */
 export const createStore = <Data = any>(
-  options: { middlewareList: Middleware<Data>[] } = {
+  options: Options<Data> = {
+    initialStore: {},
     middlewareList: [],
   },
 ): Store<Data> => {
+  const { initialStore = {}, middlewareList = [] } = options;
   const store: Store<Data> = {
-    _store: {},
+    _store: initialStore,
     _listenerList: [],
-    _middlewareList: options.middlewareList,
+    _middlewareList: middlewareList,
     _emit: () => {
       for (const listener of store._listenerList) {
         listener();

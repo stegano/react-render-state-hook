@@ -13,6 +13,14 @@ export interface Middleware<Data, Dataset = Record<string, Data>> {
 }
 
 /**
+ * `createStore` function options
+ */
+export interface Options<Data> {
+  initialStore?: Record<string, Data>;
+  middlewareList?: Middleware<Data>[];
+}
+
+/**
  * Get data
  */
 export interface Getter<Data> {
