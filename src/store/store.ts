@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
@@ -12,10 +13,21 @@ export const createStore = <Data = any>(
   options: Options<Data> = {
     initialStore: {},
     middlewareList: [],
+    debug: false,
   },
 ): Store<Data> => {
-  const { initialStore = {}, middlewareList = [] } = options;
-
+  const { initialStore = {}, middlewareList = [], debug = false } = options;
+  if (debug) {
+    middlewareList.push((id, data, _store) => {
+      const datetime = new Date().toISOString();
+      console.groupCollapsed(`[${datetime}] %c${id}`, "color: #0f0; font-weight: bold", data);
+      console.log(`%cStore › ${id}`, "color: #f0f; font-weight: bold", data);
+      console.log("%cStore", "color: #f0f; font-weight: bold", _store);
+      console.trace("Callstack");
+      console.groupEnd();
+      return data;
+    });
+  }
   const store: Store<Data> = {
     _store: initialStore,
     _listenerList: [],

@@ -72,6 +72,7 @@ describe("store", () => {
   });
   it("multiple middleware test", () => {
     const store = createStore({
+      debug: true,
       middlewareList: [
         (_id, data) => {
           return data.map((item: string) => item.toUpperCase());

@@ -18,6 +18,7 @@ export interface Middleware<Data, Dataset = Record<string, Data>> {
 export interface Options<Data> {
   initialStore?: Record<string, Data>;
   middlewareList?: Middleware<Data>[];
+  debug?: boolean;
 }
 
 /**
