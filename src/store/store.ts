@@ -22,6 +22,10 @@ export const createStore = <Data = any>(
         listener();
       }
     },
+    _reset: () => {
+      store._store = {};
+      store._emit();
+    },
     set: (id, data) => {
       let _data = typeof data === "function" ? (data as Function)(store._store[id]) : data;
       for (const middleware of store._middlewareList) {

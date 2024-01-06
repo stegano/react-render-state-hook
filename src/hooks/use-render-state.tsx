@@ -1,4 +1,5 @@
-/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable @typescript-eslint/no-loop-func */
 import { useCallback, useContext, useMemo, useSyncExternalStore, useId } from "react";
 import {
   DataHandlingStatus,
@@ -10,10 +11,6 @@ import {
   DataResetHandler,
 } from "./use-render-state.interface";
 import { RenderStateContext } from "../contexts";
-import type { IRenderStateContext } from "../contexts";
-import { Store } from "../store";
-
-const store = Store.createStore<DataHandlingState<any, any>>();
 
 const useRenderState = <Data extends any = any, DataHandlingError = Error | unknown>(
   options: Options<Data> = {},
@@ -21,6 +18,8 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
 ): Renderer<Data, DataHandlingError> => {
   const hookId = useId();
   const currentHookKey = useMemo(() => key ?? hookId, [key, hookId]);
+  const context = useContext(RenderStateContext);
+  const store = useMemo(() => context.getStroe<Data, DataHandlingError>(), [context]);
   const globalState = useSyncExternalStore<
     Record<string, DataHandlingState<Data, DataHandlingError>>
   >(store.subscribe, store.getSnapshot, store.getSnapshot);
@@ -37,42 +36,51 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
     return { status: DataHandlingStatus.IDLE };
   }, [globalState, currentHookKey, options]);
 
-  const context = useContext<IRenderStateContext.Context>(RenderStateContext);
-
   const handleData: DataHandler<Data> = useCallback(
     async (dataHandlerExecutor, executorId?: string) => {
       try {
-        const { dataHandlerExecutorInterceptors } = context;
-        if (dataHandlerExecutorInterceptors.length > 0) {
-          let promise: Promise<any> | undefined;
-          for (const dataProcessingHandler of dataHandlerExecutorInterceptors) {
-            // eslint-disable-next-line no-await-in-loop
-            const previousData = await promise;
-            promise = dataProcessingHandler(previousData, dataHandlerExecutor, executorId);
-            if (promise instanceof Promise) {
-              // eslint-disable-next-line @typescript-eslint/no-loop-func
+        const { getDataHandlerExecutorInterceptorList } = context;
+        const dataHandlerExecutorInterceptorList = getDataHandlerExecutorInterceptorList<Data>();
+        if (dataHandlerExecutorInterceptorList.length > 0) {
+          let previousData: Data | undefined;
+          for (let i = 0; i < dataHandlerExecutorInterceptorList.length; i += 1) {
+            const dataProcessingHandler = dataHandlerExecutorInterceptorList[i];
+            const evaludatedData = dataProcessingHandler(
+              previousData,
+              dataHandlerExecutor,
+              executorId,
+            );
+            if (i === 0 && evaludatedData instanceof Promise) {
+              /**
+               * If the data is a promise, the status is set to `IN_PROGRESS` and the promise is stored.
+               */
               store.set(currentHookKey, (prev) => {
                 return {
-                  promise,
+                  promise: evaludatedData,
                   data: prev?.data,
                   previousData: prev?.previousData,
                   status: DataHandlingStatus.IN_PROGRESS,
                 };
               });
             }
+            previousData = await evaludatedData;
+            store.set(currentHookKey, (prev) => ({
+              data: previousData,
+              previousData: prev?.data,
+              status: DataHandlingStatus.COMPLETED,
+            }));
+            if (i === dataHandlerExecutorInterceptorList.length - 1) {
+              return await evaludatedData;
+            }
           }
-          const data = await promise;
-          store.set(currentHookKey, (prev) => ({
-            data,
-            previousData: prev?.data,
-            status: DataHandlingStatus.COMPLETED,
-          }));
-          return data;
         }
         const evaludatedData = dataHandlerExecutor(store.get(currentHookKey)?.data);
         const promise =
           evaludatedData instanceof Promise ? evaludatedData : Promise.resolve(evaludatedData);
         if (evaludatedData instanceof Promise) {
+          /**
+           * If the data is a promise, the status is set to `IN_PROGRESS` and the promise is stored.
+           */
           store.set(currentHookKey, (prev) => ({
             data: prev?.data,
             previousData: prev?.previousData,
@@ -98,7 +106,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
         throw e;
       }
     },
-    [context, currentHookKey],
+    [context, currentHookKey, store],
   );
 
   const handleDataReset: DataResetHandler = useCallback(() => {
@@ -106,7 +114,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
       previousData: prev?.data,
       status: DataHandlingStatus.IDLE,
     }));
-  }, [currentHookKey]);
+  }, [currentHookKey, store]);
 
   const render: Render<Data, DataHandlingError> = useCallback(
     (

@@ -2,6 +2,8 @@ import ReactTestRender from "react-test-renderer";
 import { useCallback, useEffect } from "react";
 import { useRenderState } from "./hooks";
 import { RenderStateProvider } from "./contexts";
+import { createStore } from "./store/store";
+import { defaultStore } from "./contexts/render-state";
 
 const delay = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -12,7 +14,10 @@ describe("`useRenderState` Testing", () => {
   beforeAll(() => {
     jest.spyOn(console, "error").mockImplementation(() => {});
   });
-
+  beforeEach(() => {
+    // eslint-disable-next-line no-underscore-dangle
+    defaultStore._reset();
+  });
   it("renderSuccess", async () => {
     const TestComponent = () => {
       const task = useCallback(
@@ -640,6 +645,88 @@ describe("`useRenderState` Testing", () => {
       await delay(1);
       const state3 = component.toJSON() as ReactTestRender.ReactTestRendererJSON;
       expect(state3.children?.join("")).toEqual("Idle");
+    });
+  });
+  it("shared data with custom store", async () => {
+    const TestComponentA = () => {
+      const task = useCallback(
+        async () =>
+          new Promise((resolve) => {
+            setTimeout(resolve, 100);
+          }),
+        [],
+      );
+      const [render, handleData] = useRenderState<string>(undefined, "share1");
+      useEffect(() => {
+        handleData(async () => {
+          await task();
+          return "Aaa";
+        });
+      }, [handleData, task]);
+      return render(
+        (data, prevData) => {
+          return (
+            <button
+              type="button"
+              onClick={() => {
+                handleData(async () => {
+                  await task();
+                  return "Bbb";
+                });
+              }}
+            >
+              Success({data}
+              {prevData ? `, ${prevData}` : ""})
+            </button>
+          );
+        },
+        <p>Idle</p>,
+        <p>Loading</p>,
+        <p>Error</p>,
+      );
+    };
+    const TestComponentB = () => {
+      const [render] = useRenderState<string>(undefined, "share1");
+      return render(
+        (data, prevData) => {
+          return (
+            <button type="button">
+              Success({data}
+              {prevData ? `, ${prevData}` : ""})
+            </button>
+          );
+        },
+        <p>Idle</p>,
+        <p>Loading</p>,
+        <p>Error</p>,
+      );
+    };
+    const customStore = createStore();
+    const componentA = ReactTestRender.create(
+      <RenderStateProvider store={customStore}>
+        <TestComponentA />
+      </RenderStateProvider>,
+    );
+    const componentAState = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
+    expect(componentAState.children?.join("")).toEqual("Idle");
+    const componentB = ReactTestRender.create(
+      <RenderStateProvider store={customStore}>
+        <TestComponentB />
+      </RenderStateProvider>,
+    );
+    await ReactTestRender.act(async () => {
+      await delay(100 * 2);
+      const componentAstate2 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(componentAstate2.children?.join("")).toEqual("Success(Aaa)");
+      componentAstate2.props.onClick();
+      await delay(100 * 2);
+      const componentAstate3 = componentA.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(componentAstate3.children?.join("")).toEqual("Success(Bbb, Aaa)");
+      const componentBstate3 = componentB.toJSON() as ReactTestRender.ReactTestRendererJSON;
+      expect(componentBstate3.children?.join("")).toEqual("Success(Bbb, Aaa)");
+      expect(customStore.getSnapshot()).toEqual({
+        share1: { data: "Bbb", previousData: "Aaa", status: "COMPLETED" },
+      });
     });
   });
 });

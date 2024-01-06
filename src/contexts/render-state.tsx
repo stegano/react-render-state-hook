@@ -1,16 +1,33 @@
 import { createContext, useMemo } from "react";
 import { Context, Props } from "./render-state.interface";
+import { createStore } from "../store/store";
+
+export const defaultStore = createStore();
 
 export const RenderStateContext = createContext<Context>({
-  dataHandlerExecutorInterceptors: [],
+  getDataHandlerExecutorInterceptorList: () => {
+    return [];
+  },
+  getStroe: () => {
+    return defaultStore;
+  },
 });
 
-function RenderStateProvider({ children, dataHandlerExecutorInterceptors = [] }: Props) {
+function RenderStateProvider({
+  children,
+  dataHandlerExecutorInterceptors = [],
+  store = defaultStore,
+}: Props) {
   const state = useMemo(
     () => ({
-      dataHandlerExecutorInterceptors,
+      getDataHandlerExecutorInterceptorList: () => {
+        return dataHandlerExecutorInterceptors;
+      },
+      getStroe: () => {
+        return store;
+      },
     }),
-    [dataHandlerExecutorInterceptors],
+    [dataHandlerExecutorInterceptors, store],
   );
   return <RenderStateContext.Provider value={state}>{children}</RenderStateContext.Provider>;
 }
