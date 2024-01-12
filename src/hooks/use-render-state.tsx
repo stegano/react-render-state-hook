@@ -57,11 +57,11 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
         const { getDataHandlerExecutorInterceptorList } = context;
         const dataHandlerExecutorInterceptorList = getDataHandlerExecutorInterceptorList<Data>();
         if (dataHandlerExecutorInterceptorList.length > 0) {
-          let previousData: Data | undefined;
+          let previousResult: Data | undefined;
           for (let i = 0; i < dataHandlerExecutorInterceptorList.length; i += 1) {
-            const dataProcessingHandler = dataHandlerExecutorInterceptorList[i];
-            const evaludatedData = dataProcessingHandler(
-              previousData,
+            const dataHandlerExecutorInterceptor = dataHandlerExecutorInterceptorList[i];
+            const evaludatedData = dataHandlerExecutorInterceptor(
+              previousResult,
               () => dataHandlerExecutor(store.get(currentHookKey)?.data),
               executorId,
             );
@@ -78,9 +78,9 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
                 };
               });
             }
-            previousData = await evaludatedData;
+            previousResult = await evaludatedData;
             store.set(currentHookKey, (prev) => ({
-              data: previousData,
+              data: previousResult,
               previousData: prev?.data,
               status: DataHandlingStatus.COMPLETED,
             }));
