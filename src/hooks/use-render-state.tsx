@@ -28,11 +28,26 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
       return globalState[currentHookKey];
     }
     if ("default" in options) {
+      store.set(
+        currentHookKey,
+        {
+          status: DataHandlingStatus.COMPLETED,
+          data: options.default,
+        },
+        true,
+      );
       return {
         status: DataHandlingStatus.COMPLETED,
         data: options.default,
       };
     }
+    store.set(
+      currentHookKey,
+      {
+        status: DataHandlingStatus.IDLE,
+      },
+      true,
+    );
     return { status: DataHandlingStatus.IDLE };
   }, [globalState, currentHookKey, options]);
 

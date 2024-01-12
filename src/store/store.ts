@@ -41,7 +41,7 @@ export const createStore = <Data = any>(
       store._store = {};
       store._emit();
     },
-    set: (id, data) => {
+    set: (id, data, silent = false) => {
       let _data: Data = typeof data === "function" ? (data as Function)(store._store[id]) : data;
       for (const middleware of store._middlewareList) {
         _data = middleware(id, _data, store._store);
@@ -50,7 +50,9 @@ export const createStore = <Data = any>(
         ...store._store,
         [id]: _data,
       };
-      store._emit();
+      if (silent === false) {
+        store._emit();
+      }
     },
     get: (id) => {
       return store._store[id];
