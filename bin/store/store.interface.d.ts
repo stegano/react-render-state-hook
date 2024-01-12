@@ -28,7 +28,7 @@ export interface Getter<Data> {
  * Set data
  */
 export interface Setter<Data> {
-    (id: string, data: ((prevData?: Data) => Data) | Data): void;
+    (id: string, data: ((prevData?: Data) => Data) | Data, silent?: boolean): void;
 }
 /**
  * Get snapshot
