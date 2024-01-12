@@ -4,8 +4,8 @@ import { Store } from "../store/store.interface";
 
 export interface DataHandlerExecutorInterceptor<Data extends any = any> {
   (
-    previousData: Data | undefined,
-    dataHandlerExecutor: DataHandlerExecutor<Data>,
+    previousExecutorData: Data | undefined,
+    dataHandlerExecutor: () => ReturnType<DataHandlerExecutor<Data>>,
     executorId?: string,
   ): ReturnType<typeof dataHandlerExecutor>;
 }

@@ -49,7 +49,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
       true,
     );
     return { status: DataHandlingStatus.IDLE };
-  }, [globalState, currentHookKey, options]);
+  }, [currentHookKey, globalState, options, store]);
 
   const handleData: DataHandler<Data> = useCallback(
     async (dataHandlerExecutor, executorId?: string) => {
@@ -62,7 +62,7 @@ const useRenderState = <Data extends any = any, DataHandlingError = Error | unkn
             const dataProcessingHandler = dataHandlerExecutorInterceptorList[i];
             const evaludatedData = dataProcessingHandler(
               previousData,
-              dataHandlerExecutor,
+              () => dataHandlerExecutor(store.get(currentHookKey)?.data),
               executorId,
             );
             if (i === 0 && evaludatedData instanceof Promise) {
