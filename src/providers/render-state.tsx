@@ -16,13 +16,15 @@ export const RenderStateContext = createContext<Context>({
 
 function RenderStateProvider({
   children,
-  dataHandlerExecutorInterceptorList = [],
+  dataHandlerExecutorInterceptorList,
   store = defaultStore,
 }: Props) {
   const state = useMemo(
     () => ({
       getDataHandlerExecutorInterceptorList: () => {
-        return dataHandlerExecutorInterceptorList;
+        return dataHandlerExecutorInterceptorList !== undefined
+          ? dataHandlerExecutorInterceptorList
+          : [];
       },
       getStroe: () => {
         return store;
