@@ -18,6 +18,13 @@ Alternately, download the source.
 git clone https://github.com/stegano/react-render-state-hook.git
 ```
 
+## API Docs
+
+* [English](https://github.com/stegano/react-render-state-hook/blob/main/docs/APIs.md)
+
+* [Korean(한국어)](https://github.com/stegano/react-render-state-hook/blob/main/docs/ko/APIs.md)
+
+
 ## Quick Start
 
 ### Basic 
