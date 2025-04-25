@@ -4,6 +4,11 @@
 
 React Render State Hook: This hook allows you to declaratively define components that will be rendered based on the data processing state.
 
+## Deprecated 🚀
+This library has been updated to [react-render-state](https://www.npmjs.com/package/react-render-state), allowing for more reliable use of almost all the features. Please check the link below for further information.
+
+https://www.npmjs.com/package/react-render-state
+
 ## Installation
 
 The easiest way to install [`react-render-state-hook`](https://www.npmjs.com/package/react-render-state-hook) is with [npm](https://www.npmjs.com/).
@@ -17,13 +22,6 @@ Alternately, download the source.
 ```bash
 git clone https://github.com/stegano/react-render-state-hook.git
 ```
-
-## API Docs
-
-* [English](https://github.com/stegano/react-render-state-hook/blob/main/docs/APIs.md)
-
-* [Korean(한국어)](https://github.com/stegano/react-render-state-hook/blob/main/docs/ko/APIs.md)
-
 
 ## Quick Start
 
